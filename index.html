@@ -38,8 +38,6 @@
       const repairTools = [];
       const obstacleWidth = 50;
       const obstacleHeight = 50;
-      const rescueWidth = 40;
-      const rescueHeight = 40;
       const repairWidth = 50;
       const repairHeight = 50;
 
@@ -72,6 +70,20 @@
       rockImages.forEach((rock) => {
         rock.image = new Image();
         rock.image.src = rock.src;
+      });
+
+      const rescueImages = [
+        { src: "assets/rescues/rescue1.svg", width: 30.8, height: 30.8 },
+        { src: "assets/rescues/rescue2.svg", width: 30.8, height: 30.8 },
+        { src: "assets/rescues/rescue3.svg", width: 30.8, height: 30.8 },
+        { src: "assets/rescues/rescue4.svg", width: 30.8, height: 28 },
+        { src: "assets/rescues/rescue5.svg", width: 30.8, height: 28 },
+        { src: "assets/rescues/rescue6.svg", width: 30.8, height: 28 },
+      ];
+
+      rescueImages.forEach((rescue) => {
+        rescue.image = new Image();
+        rescue.image.src = rescue.src;
       });
 
       let touchX = null;
@@ -119,17 +131,8 @@
       }
 
       function drawRescueItems() {
-        ctx.fillStyle = "yellow";
         rescueItems.forEach((item) => {
-          ctx.beginPath();
-          ctx.arc(
-            item.x + rescueWidth / 2,
-            item.y + rescueHeight / 2,
-            rescueWidth / 2,
-            0,
-            Math.PI * 2
-          );
-          ctx.fill();
+          ctx.drawImage(item.image, item.x, item.y, item.width, item.height);
         });
       }
 
@@ -204,8 +207,8 @@
               boatHeight,
               item.x,
               item.y,
-              rescueWidth,
-              rescueHeight
+              item.width,
+              item.height
             )
           ) {
             rescueItems.splice(index, 1);
@@ -214,9 +217,14 @@
         });
 
         if (Math.random() < 0.005) {
+          const randomRescue =
+            rescueImages[Math.floor(Math.random() * rescueImages.length)];
           rescueItems.push({
-            x: Math.random() * (canvas.width - rescueWidth),
-            y: -rescueHeight,
+            x: Math.random() * (canvas.width - randomRescue.width),
+            y: -randomRescue.height,
+            image: randomRescue.image,
+            width: randomRescue.width,
+            height: randomRescue.height,
           });
         }
       }
