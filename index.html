@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boat Journey Game</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #87ceeb;
+      }
+
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      let boatX = canvas.width / 2;
+      const boatY = canvas.height - 100;
+      const boatWidth = 66;
+      const boatHeight = 113.025;
+      let boatSpeed = 10;
+
+      const obstacles = [];
+      const rescueItems = [];
+      const rocks = [];
+      const obstacleWidth = 50;
+      const obstacleHeight = 50;
+      const rescueWidth = 40;
+      const rescueHeight = 40;
+      const rockWidth = 60;
+      const rockHeight = 60;
+
+      let score = 0;
+      let gameOver = false;
+      let gameSpeed = 0.7; // Start with adjusted speed
+      let lastSpeedUpdateScore = 0; // Track last score when speed was updated
+      let lives = 3; // Player starts with 3 lives
+
+      // Load boat images for different lives
+      const boatImages = {
+        3: new Image(),
+        2: new Image(),
+        1: new Image(),
+        0: new Image(),
+      };
+      boatImages[3].src = "assets/ships/hp_3.svg";
+      boatImages[2].src = "assets/ships/hp_2.svg";
+      boatImages[1].src = "assets/ships/hp_1.svg";
+      boatImages[0].src = "assets/ships/hp_0.svg";
+
+      // Event listeners for touch controls
+      let touchX = null;
+
+      window.addEventListener("touchstart", (e) => {
+        touchX = e.touches[0].clientX;
+      });
+
+      window.addEventListener("touchmove", (e) => {
+        touchX = e.touches[0].clientX;
+      });
+
+      window.addEventListener("touchend", () => {
+        touchX = null;
+      });
+
+      function drawBoat() {
+        const currentBoatImage = boatImages[lives] || boatImages[0];
+        ctx.drawImage(currentBoatImage, boatX, boatY, boatWidth, boatHeight);
+      }
+
+      function drawObstacles() {
+        ctx.fillStyle = "red";
+        obstacles.forEach((obs) => {
+          ctx.fillRect(obs.x, obs.y, obstacleWidth, obstacleHeight);
+        });
+      }
+
+      function drawRescueItems() {
+        ctx.fillStyle = "yellow";
+        rescueItems.forEach((item) => {
+          ctx.beginPath();
+          ctx.arc(
+            item.x + rescueWidth / 2,
+            item.y + rescueHeight / 2,
+            rescueWidth / 2,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+        });
+      }
+
+      function drawRocks() {
+        ctx.fillStyle = "gray";
+        rocks.forEach((rock) => {
+          ctx.fillRect(rock.x, rock.y, rockWidth, rockHeight);
+        });
+      }
+
+      function updateObstacles() {
+        obstacles.forEach((obs, index) => {
+          obs.y += 5 * gameSpeed;
+          if (obs.y > canvas.height) {
+            obstacles.splice(index, 1);
+          }
+
+          // Collision detection
+          if (
+            boatX < obs.x + obstacleWidth &&
+            boatX + boatWidth > obs.x &&
+            boatY < obs.y + obstacleHeight &&
+            boatY + boatHeight > obs.y
+          ) {
+            obstacles.splice(index, 1);
+            lives--;
+            if (lives <= 0) {
+              gameOver = true;
+            }
+          }
+        });
+
+        if (Math.random() < 0.005) {
+          // Further reduced frequency
+          obstacles.push({
+            x: Math.random() * (canvas.width - obstacleWidth),
+            y: -obstacleHeight,
+          });
+        }
+      }
+
+      function updateRescueItems() {
+        rescueItems.forEach((item, index) => {
+          item.y += 3 * gameSpeed;
+          if (item.y > canvas.height) {
+            rescueItems.splice(index, 1);
+          }
+
+          // Collision detection
+          if (
+            boatX < item.x + rescueWidth &&
+            boatX + boatWidth > item.x &&
+            boatY < item.y + rescueHeight &&
+            boatY + boatHeight > item.y
+          ) {
+            rescueItems.splice(index, 1);
+            score++;
+          }
+        });
+
+        if (Math.random() < 0.005) {
+          // Reduced frequency
+          rescueItems.push({
+            x: Math.random() * (canvas.width - rescueWidth),
+            y: -rescueHeight,
+          });
+        }
+      }
+
+      function updateRocks() {
+        rocks.forEach((rock, index) => {
+          rock.y += 3 * gameSpeed;
+          if (rock.y > canvas.height) {
+            rocks.splice(index, 1);
+          }
+
+          // Collision detection
+          if (
+            boatX < rock.x + rockWidth &&
+            boatX + boatWidth > rock.x &&
+            boatY < rock.y + rockHeight &&
+            boatY + boatHeight > rock.y
+          ) {
+            rocks.splice(index, 1);
+            lives--;
+            if (lives <= 0) {
+              gameOver = true;
+            }
+          }
+        });
+
+        if (Math.random() < 0.005) {
+          // Similar frequency to rescue items
+          rocks.push({
+            x: Math.random() * (canvas.width - rockWidth),
+            y: -rockHeight,
+          });
+        }
+      }
+
+      function updateBoat() {
+        if (touchX !== null) {
+          boatX += (touchX - boatX - boatWidth / 2) * 0.1;
+        }
+
+        if (boatX < 0) boatX = 0;
+        if (boatX + boatWidth > canvas.width) boatX = canvas.width - boatWidth;
+      }
+
+      function drawScore() {
+        ctx.fillStyle = "black";
+        ctx.font = "24px Arial";
+        ctx.fillText(`Score: ${score}`, 10, 30);
+        ctx.fillText(`Lives: ${lives}`, 10, 60);
+      }
+
+      function increaseGameSpeed() {
+        if (score > 0 && score % 10 === 0 && score !== lastSpeedUpdateScore) {
+          gameSpeed += 0.05;
+          lastSpeedUpdateScore = score;
+        }
+      }
+
+      function gameLoop() {
+        if (gameOver) {
+          ctx.fillStyle = "black";
+          ctx.font = "48px Arial";
+          ctx.fillText("Game Over", canvas.width / 2 - 120, canvas.height / 2);
+          return;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawBoat();
+        drawObstacles();
+        drawRescueItems();
+        drawRocks();
+        drawScore();
+
+        updateBoat();
+        updateObstacles();
+        updateRescueItems();
+        updateRocks();
+        increaseGameSpeed();
+
+        requestAnimationFrame(gameLoop);
+      }
+
+      gameLoop();
+    </script>
+  </body>
+</html>
