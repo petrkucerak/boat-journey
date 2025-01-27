@@ -5,8 +5,8 @@
    x="0px"
    y="0px"
    width="66"
-   height="113.025"
-   viewBox="0 0 66 113.025"
+   height="130.69559"
+   viewBox="0 0 66 130.69559"
    id="svg1287"
    sodipodi:docname="hp_3.svg"
    inkscape:version="1.4 (86a8ad7, 2024-10-11)"
@@ -24,9 +24,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="1.3876971"
-     inkscape:cx="325.35919"
-     inkscape:cy="291.49012"
+     inkscape:zoom="15.7"
+     inkscape:cx="52.133757"
+     inkscape:cy="102.26114"
      inkscape:window-width="2880"
      inkscape:window-height="1694"
      inkscape:window-x="-11"
@@ -35,6 +35,22 @@
      inkscape:current-layer="svg1287" />
   <defs
      id="defs1064">
+    <linearGradient
+       id="linearGradient3"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0.7011494;"
+         offset="0"
+         id="stop3" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0.22824302;"
+         offset="0.84099871"
+         id="stop6" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop4" />
+    </linearGradient>
     <g
        id="Layer0_0_FILL">
       <path
@@ -6027,7 +6043,51 @@
          d="m 1188.4,279.55 q -3.85,0.3 -7.35,1.55 -3.35,1.2 -5.25,4 -1.95,3 -1.75,6.6 0.2,3.05 1.55,6 0.95,2 2.2,3.9 2.35,3.2 -0.25,6.35 -1.25,1.45 -2.6,2.5 -0.15,2.55 1.45,4.45 1.1,1.3 2.75,1.95 3.55,1.15 7.15,-0.3 1.3,-0.55 2.05,-1.7 1.85,-2.7 2.95,-5.8 1.45,-4.1 0.15,-8.25 -0.9,-3.05 -2.85,-5.45 -2.8,-3.5 -5.25,-7.3 -1.2,-1.85 -0.4,-3.85 0.65,-1.7 2.25,-2.75 1.6,-1.05 3.2,-1.9 z"
          id="path1064" />
     </g>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3"
+       id="linearGradient4"
+       x1="-15.436909"
+       y1="148.24884"
+       x2="-15.814455"
+       y2="207.98972"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(0.59763098,0.68292196)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3"
+       id="linearGradient6"
+       gradientUnits="userSpaceOnUse"
+       x1="-15.436909"
+       y1="148.24884"
+       x2="-15.814455"
+       y2="207.98972"
+       gradientTransform="translate(63.093713,-20.535935)" />
   </defs>
+  <g
+     id="g6"
+     transform="matrix(0.50262771,0,0,0.50743121,16.413286,32.015278)">
+    <rect
+       style="fill:url(#linearGradient4)"
+       id="rect1-0"
+       width="11.719745"
+       height="107.26115"
+       x="-20.699152"
+       y="101.16107"
+       transform="matrix(-0.94691039,0.32149762,0.32149762,0.94691039,0,0)"
+       inkscape:transform-center-x="-57.070063"
+       inkscape:transform-center-y="-14.522289" />
+    <rect
+       style="fill:url(#linearGradient6);fill-opacity:1"
+       id="rect1-0-8"
+       width="11.719745"
+       height="107.26115"
+       x="41.796932"
+       y="79.942223"
+       transform="rotate(18.753519)"
+       inkscape:transform-center-x="57.070066"
+       inkscape:transform-center-y="-14.522282" />
+  </g>
   <g
      id="g1192"
      transform="rotate(180,56.5,78.0125)">

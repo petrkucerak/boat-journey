@@ -27,9 +27,11 @@
       canvas.height = window.innerHeight;
 
       let boatX = canvas.width / 2;
-      const boatY = canvas.height - 150;
-      const boatWidth = 66;
-      const boatHeight = 113.025;
+      const boatY = canvas.height - 140;
+      const boatWidth = 66; // used for collision detection
+      const boatHeight = 113.025; // used for collision detection
+      const fullBoatWidth = 66; // used for image rendering
+      const fullBoatHeight = 130; // used for image rendering
       let boatSpeed = 10;
 
       const obstacles = [];
@@ -118,8 +120,8 @@
           boatImages[lives] || boatImages[0],
           boatX,
           boatY,
-          boatWidth,
-          boatHeight
+          fullBoatWidth,
+          fullBoatHeight
         );
       }
 
@@ -349,7 +351,13 @@
           ctx.font = "48px Arial";
           ctx.fillText("Game Over", canvas.width / 2 - 120, canvas.height / 2);
           const gameOverBoat = boatImages[0];
-          ctx.drawImage(gameOverBoat, boatX, boatY, boatWidth, boatHeight);
+          ctx.drawImage(
+            gameOverBoat,
+            boatX,
+            boatY,
+            fullBoatWidth,
+            fullBoatHeight
+          );
           return;
         }
 
