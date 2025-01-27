@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   id="svg846"
+   sodipodi:docname="reparibox.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   width="28"
+   height="28"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview846"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.6345952"
+     inkscape:cx="294.56835"
+     inkscape:cy="215.03795"
+     inkscape:window-width="2880"
+     inkscape:window-height="1694"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg846" />
+  <defs
+     id="defs1" />
+  <path
+     stroke="none"
+     fill="#875c30"
+     d="M 2,0 H 26 Q 26.85,0 27.45,0.6 28,1.15 28,2 v 24 q 0,0.85 -0.55,1.45 Q 26.85,28 26,28 H 2 Q 1.15,28 0.6,27.45 0,26.85 0,26 V 2 Q 0,1.15 0.6,0.6 1.15,0 2,0 M 2,2 V 26 H 26 V 2 H 2"
+     id="path573" />
+  <path
+     stroke="none"
+     fill="#af783f"
+     d="M 6,10 V 6 h 4 l -4,4 m 12,12 4,-4 v 4 h -4"
+     id="path574" />
+  <path
+     stroke="none"
+     fill="#bb8044"
+     d="M 18,22 6,10 10,6 H 6 v 4 12 h 12 4 v -4 l -4,4 m 4,-4 V 6 H 10 L 22,18 M 2,2 H 26 V 26 H 2 V 2"
+     id="path575" />
+  <path
+     stroke="none"
+     fill="#85592e"
+     d="M 6,10 18,22 H 6 V 10 M 22,18 10,6 h 12 v 12"
+     id="path576" />
+</svg>
