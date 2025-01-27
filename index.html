@@ -27,7 +27,7 @@
       canvas.height = window.innerHeight;
 
       let boatX = canvas.width / 2;
-      const boatY = canvas.height - 150; // Increased offset from bottom
+      const boatY = canvas.height - 150;
       const boatWidth = 66;
       const boatHeight = 113.025;
       let boatSpeed = 10;
@@ -45,11 +45,10 @@
 
       let score = 0;
       let gameOver = false;
-      let gameSpeed = 0.7; // Start with adjusted speed
-      let lastSpeedUpdateScore = 0; // Track last score when speed was updated
-      let lives = 3; // Player starts with 3 lives
+      let gameSpeed = 0.7;
+      let lastSpeedUpdateScore = 0;
+      let lives = 3;
 
-      // Load boat images for different lives
       const boatImages = {
         3: new Image(),
         2: new Image(),
@@ -61,14 +60,13 @@
       boatImages[1].src = "assets/ships/hp_1.svg";
       boatImages[0].src = "assets/ships/hp_0.svg";
 
-      // Load rock images
       const rockImages = [
-        { src: "assets/rocks/rock1.svg", width: 34.004547, height: 34 },
-        { src: "assets/rocks/rock2.svg", width: 54.014584, height: 45.998333 },
-        { src: "assets/rocks/rock3.svg", width: 40.013393, height: 40.009285 },
-        { src: "assets/rocks/rock4.svg", width: 34.004547, height: 34 },
-        { src: "assets/rocks/rock5.svg", width: 54.014584, height: 45.998333 },
-        { src: "assets/rocks/rock6.svg", width: 40.013393, height: 40.009285 },
+        { src: "assets/rocks/rock1.svg", width: 34, height: 34 },
+        { src: "assets/rocks/rock2.svg", width: 54, height: 46 },
+        { src: "assets/rocks/rock3.svg", width: 40, height: 40 },
+        { src: "assets/rocks/rock4.svg", width: 34, height: 34 },
+        { src: "assets/rocks/rock5.svg", width: 54, height: 46 },
+        { src: "assets/rocks/rock6.svg", width: 40, height: 40 },
       ];
 
       rockImages.forEach((rock) => {
@@ -76,7 +74,6 @@
         rock.image.src = rock.src;
       });
 
-      // Event listeners for touch controls
       let touchX = null;
 
       window.addEventListener("touchstart", (e) => {
@@ -91,29 +88,27 @@
         touchX = null;
       });
 
-      // Event listeners for keyboard controls
       let leftArrowPressed = false;
       let rightArrowPressed = false;
 
       window.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowLeft") {
-          leftArrowPressed = true;
-        } else if (e.key === "ArrowRight") {
-          rightArrowPressed = true;
-        }
+        if (e.key === "ArrowLeft") leftArrowPressed = true;
+        else if (e.key === "ArrowRight") rightArrowPressed = true;
       });
 
       window.addEventListener("keyup", (e) => {
-        if (e.key === "ArrowLeft") {
-          leftArrowPressed = false;
-        } else if (e.key === "ArrowRight") {
-          rightArrowPressed = false;
-        }
+        if (e.key === "ArrowLeft") leftArrowPressed = false;
+        else if (e.key === "ArrowRight") rightArrowPressed = false;
       });
 
       function drawBoat() {
-        const currentBoatImage = boatImages[lives] || boatImages[0];
-        ctx.drawImage(currentBoatImage, boatX, boatY, boatWidth, boatHeight);
+        ctx.drawImage(
+          boatImages[lives] || boatImages[0],
+          boatX,
+          boatY,
+          boatWidth,
+          boatHeight
+        );
       }
 
       function drawObstacles() {
@@ -151,6 +146,14 @@
         });
       }
 
+      function isEllipseCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
+        const dx = x1 + w1 / 2 - (x2 + w2 / 2);
+        const dy = y1 + h1 / 2 - (y2 + h2 / 2);
+        const rw = (w1 + w2) / 2;
+        const rh = (h1 + h2) / 2;
+        return (dx * dx) / (rw * rw) + (dy * dy) / (rh * rh) <= 1;
+      }
+
       function updateObstacles() {
         obstacles.forEach((obs, index) => {
           obs.y += 5 * gameSpeed;
@@ -158,12 +161,17 @@
             obstacles.splice(index, 1);
           }
 
-          // Collision detection
           if (
-            boatX < obs.x + obstacleWidth &&
-            boatX + boatWidth > obs.x &&
-            boatY < obs.y + obstacleHeight &&
-            boatY + boatHeight > obs.y
+            isEllipseCollision(
+              boatX,
+              boatY,
+              boatWidth,
+              boatHeight,
+              obs.x,
+              obs.y,
+              obstacleWidth,
+              obstacleHeight
+            )
           ) {
             obstacles.splice(index, 1);
             lives--;
@@ -174,7 +182,6 @@
         });
 
         if (Math.random() < 0.005) {
-          // Further reduced frequency
           obstacles.push({
             x: Math.random() * (canvas.width - obstacleWidth),
             y: -obstacleHeight,
@@ -189,12 +196,17 @@
             rescueItems.splice(index, 1);
           }
 
-          // Collision detection
           if (
-            boatX < item.x + rescueWidth &&
-            boatX + boatWidth > item.x &&
-            boatY < item.y + rescueHeight &&
-            boatY + boatHeight > item.y
+            isEllipseCollision(
+              boatX,
+              boatY,
+              boatWidth,
+              boatHeight,
+              item.x,
+              item.y,
+              rescueWidth,
+              rescueHeight
+            )
           ) {
             rescueItems.splice(index, 1);
             score++;
@@ -202,7 +214,6 @@
         });
 
         if (Math.random() < 0.005) {
-          // Reduced frequency
           rescueItems.push({
             x: Math.random() * (canvas.width - rescueWidth),
             y: -rescueHeight,
@@ -217,12 +228,17 @@
             rocks.splice(index, 1);
           }
 
-          // Collision detection
           if (
-            boatX < rock.x + rock.width &&
-            boatX + boatWidth > rock.x &&
-            boatY < rock.y + rock.height &&
-            boatY + boatHeight > rock.y
+            isEllipseCollision(
+              boatX,
+              boatY,
+              boatWidth,
+              boatHeight,
+              rock.x,
+              rock.y,
+              rock.width,
+              rock.height
+            )
           ) {
             rocks.splice(index, 1);
             lives--;
@@ -233,7 +249,6 @@
         });
 
         if (Math.random() < 0.005) {
-          // Similar frequency to rescue items
           const randomRock =
             rockImages[Math.floor(Math.random() * rockImages.length)];
           rocks.push({
@@ -253,12 +268,17 @@
             repairTools.splice(index, 1);
           }
 
-          // Collision detection
           if (
-            boatX < tool.x + repairWidth &&
-            boatX + boatWidth > tool.x &&
-            boatY < tool.y + repairHeight &&
-            boatY + boatHeight > tool.y
+            isEllipseCollision(
+              boatX,
+              boatY,
+              boatWidth,
+              boatHeight,
+              tool.x,
+              tool.y,
+              repairWidth,
+              repairHeight
+            )
           ) {
             repairTools.splice(index, 1);
             if (lives < 3) {
@@ -268,7 +288,6 @@
         });
 
         if (score >= 20 && Math.random() < 0.001) {
-          // Rare frequency, only after score 20
           repairTools.push({
             x: Math.random() * (canvas.width - repairWidth),
             y: -repairHeight,
