@@ -35,12 +35,13 @@
       const obstacles = [];
       const rescueItems = [];
       const rocks = [];
+      const repairTools = [];
       const obstacleWidth = 50;
       const obstacleHeight = 50;
       const rescueWidth = 40;
       const rescueHeight = 40;
-      const rockWidth = 60;
-      const rockHeight = 60;
+      const repairWidth = 50;
+      const repairHeight = 50;
 
       let score = 0;
       let gameOver = false;
@@ -60,6 +61,21 @@
       boatImages[1].src = "assets/ships/hp_1.svg";
       boatImages[0].src = "assets/ships/hp_0.svg";
 
+      // Load rock images
+      const rockImages = [
+        { src: "assets/rocks/rock1.svg", width: 34.004547, height: 34 },
+        { src: "assets/rocks/rock2.svg", width: 54.014584, height: 45.998333 },
+        { src: "assets/rocks/rock3.svg", width: 40.013393, height: 40.009285 },
+        { src: "assets/rocks/rock4.svg", width: 34.004547, height: 34 },
+        { src: "assets/rocks/rock5.svg", width: 54.014584, height: 45.998333 },
+        { src: "assets/rocks/rock6.svg", width: 40.013393, height: 40.009285 },
+      ];
+
+      rockImages.forEach((rock) => {
+        rock.image = new Image();
+        rock.image.src = rock.src;
+      });
+
       // Event listeners for touch controls
       let touchX = null;
 
@@ -73,6 +89,26 @@
 
       window.addEventListener("touchend", () => {
         touchX = null;
+      });
+
+      // Event listeners for keyboard controls
+      let leftArrowPressed = false;
+      let rightArrowPressed = false;
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+          leftArrowPressed = true;
+        } else if (e.key === "ArrowRight") {
+          rightArrowPressed = true;
+        }
+      });
+
+      window.addEventListener("keyup", (e) => {
+        if (e.key === "ArrowLeft") {
+          leftArrowPressed = false;
+        } else if (e.key === "ArrowRight") {
+          rightArrowPressed = false;
+        }
       });
 
       function drawBoat() {
@@ -103,9 +139,15 @@
       }
 
       function drawRocks() {
-        ctx.fillStyle = "gray";
         rocks.forEach((rock) => {
-          ctx.fillRect(rock.x, rock.y, rockWidth, rockHeight);
+          ctx.drawImage(rock.image, rock.x, rock.y, rock.width, rock.height);
+        });
+      }
+
+      function drawRepairTools() {
+        ctx.fillStyle = "blue";
+        repairTools.forEach((tool) => {
+          ctx.fillRect(tool.x, tool.y, repairWidth, repairHeight);
         });
       }
 
@@ -177,9 +219,9 @@
 
           // Collision detection
           if (
-            boatX < rock.x + rockWidth &&
+            boatX < rock.x + rock.width &&
             boatX + boatWidth > rock.x &&
-            boatY < rock.y + rockHeight &&
+            boatY < rock.y + rock.height &&
             boatY + boatHeight > rock.y
           ) {
             rocks.splice(index, 1);
@@ -192,9 +234,44 @@
 
         if (Math.random() < 0.005) {
           // Similar frequency to rescue items
+          const randomRock =
+            rockImages[Math.floor(Math.random() * rockImages.length)];
           rocks.push({
-            x: Math.random() * (canvas.width - rockWidth),
-            y: -rockHeight,
+            x: Math.random() * (canvas.width - randomRock.width),
+            y: -randomRock.height,
+            image: randomRock.image,
+            width: randomRock.width,
+            height: randomRock.height,
+          });
+        }
+      }
+
+      function updateRepairTools() {
+        repairTools.forEach((tool, index) => {
+          tool.y += 2 * gameSpeed;
+          if (tool.y > canvas.height) {
+            repairTools.splice(index, 1);
+          }
+
+          // Collision detection
+          if (
+            boatX < tool.x + repairWidth &&
+            boatX + boatWidth > tool.x &&
+            boatY < tool.y + repairHeight &&
+            boatY + boatHeight > tool.y
+          ) {
+            repairTools.splice(index, 1);
+            if (lives < 3) {
+              lives++;
+            }
+          }
+        });
+
+        if (score >= 20 && Math.random() < 0.001) {
+          // Rare frequency, only after score 20
+          repairTools.push({
+            x: Math.random() * (canvas.width - repairWidth),
+            y: -repairHeight,
           });
         }
       }
@@ -202,6 +279,14 @@
       function updateBoat() {
         if (touchX !== null) {
           boatX += (touchX - boatX - boatWidth / 2) * 0.1;
+        }
+
+        if (leftArrowPressed) {
+          boatX -= boatSpeed;
+        }
+
+        if (rightArrowPressed) {
+          boatX += boatSpeed;
         }
 
         if (boatX < 0) boatX = 0;
@@ -230,6 +315,7 @@
           drawObstacles();
           drawRescueItems();
           drawRocks();
+          drawRepairTools();
           drawScore();
 
           ctx.fillStyle = "black";
@@ -246,12 +332,14 @@
         drawObstacles();
         drawRescueItems();
         drawRocks();
+        drawRepairTools();
         drawScore();
 
         updateBoat();
         updateObstacles();
         updateRescueItems();
         updateRocks();
+        updateRepairTools();
         increaseGameSpeed();
 
         requestAnimationFrame(gameLoop);
