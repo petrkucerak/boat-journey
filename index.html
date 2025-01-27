@@ -225,6 +225,13 @@
       function gameLoop() {
         if (gameOver) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          drawBoat();
+          drawObstacles();
+          drawRescueItems();
+          drawRocks();
+          drawScore();
+
           ctx.fillStyle = "black";
           ctx.font = "48px Arial";
           ctx.fillText("Game Over", canvas.width / 2 - 120, canvas.height / 2);
