@@ -27,7 +27,7 @@
       canvas.height = window.innerHeight;
 
       let boatX = canvas.width / 2;
-      const boatY = canvas.height - 100;
+      const boatY = canvas.height - 150; // Increased offset from bottom
       const boatWidth = 66;
       const boatHeight = 113.025;
       let boatSpeed = 10;
@@ -224,9 +224,12 @@
 
       function gameLoop() {
         if (gameOver) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.fillStyle = "black";
           ctx.font = "48px Arial";
           ctx.fillText("Game Over", canvas.width / 2 - 120, canvas.height / 2);
+          const gameOverBoat = boatImages[0];
+          ctx.drawImage(gameOverBoat, boatX, boatY, boatWidth, boatHeight);
           return;
         }
 
