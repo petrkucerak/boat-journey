@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boat Journey Game</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #87ceeb;
+      }
+
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      let boatX = canvas.width / 2;
+      const boatY = canvas.height - 140;
+      const boatWidth = 66; // used for collision detection
+      const boatHeight = 113.025; // used for collision detection
+      const fullBoatWidth = 66; // used for image rendering
+      const fullBoatHeight = 130; // used for image rendering
+      let boatSpeed = 10;
+
+      const obstacles = [];
+      const rescueItems = [];
+      const rocks = [];
+      const repairTools = [];
+      const obstacleWidth = 50;
+      const obstacleHeight = 50;
+
+      const repairToolImage = new Image();
+      repairToolImage.src = "assets/repair/reparibox.svg";
+
+      const repairToolWidth = 28;
+      const repairToolHeight = 28;
+
+      let score = 0;
+      let gameOver = false;
+      let gameSpeed = 0.7;
+      let lastSpeedUpdateScore = 0;
+      let lives = 3;
+
+      const boatImages = {
+        3: new Image(),
+        2: new Image(),
+        1: new Image(),
+        0: new Image(),
+      };
+      boatImages[3].src = "assets/ships/hp_3.svg";
+      boatImages[2].src = "assets/ships/hp_2.svg";
+      boatImages[1].src = "assets/ships/hp_1.svg";
+      boatImages[0].src = "assets/ships/hp_0.svg";
+
+      const rockImages = [
+        { src: "assets/rocks/rock1.svg", width: 34, height: 34 },
+        { src: "assets/rocks/rock2.svg", width: 54, height: 46 },
+        { src: "assets/rocks/rock3.svg", width: 40, height: 40 },
+        { src: "assets/rocks/rock4.svg", width: 34, height: 34 },
+        { src: "assets/rocks/rock5.svg", width: 54, height: 46 },
+        { src: "assets/rocks/rock6.svg", width: 40, height: 40 },
+      ];
+
+      rockImages.forEach((rock) => {
+        rock.image = new Image();
+        rock.image.src = rock.src;
+      });
+
+      const rescueImages = [
+        { src: "assets/rescues/rescue1.svg", width: 30.8, height: 30.8 },
+        { src: "assets/rescues/rescue2.svg", width: 30.8, height: 30.8 },
+        { src: "assets/rescues/rescue3.svg", width: 30.8, height: 30.8 },
+        { src: "assets/rescues/rescue4.svg", width: 30.8, height: 28 },
+        { src: "assets/rescues/rescue5.svg", width: 30.8, height: 28 },
+        { src: "assets/rescues/rescue6.svg", width: 30.8, height: 28 },
+      ];
+
+      rescueImages.forEach((rescue) => {
+        rescue.image = new Image();
+        rescue.image.src = rescue.src;
+      });
+
+      let touchX = null;
+
+      window.addEventListener("touchstart", (e) => {
+        touchX = e.touches[0].clientX;
+      });
+
+      window.addEventListener("touchmove", (e) => {
+        touchX = e.touches[0].clientX;
+      });
+
+      window.addEventListener("touchend", () => {
+        touchX = null;
+      });
+
+      let leftArrowPressed = false;
+      let rightArrowPressed = false;
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") leftArrowPressed = true;
+        else if (e.key === "ArrowRight") rightArrowPressed = true;
+      });
+
+      window.addEventListener("keyup", (e) => {
+        if (e.key === "ArrowLeft") leftArrowPressed = false;
+        else if (e.key === "ArrowRight") rightArrowPressed = false;
+      });
+
+      function drawBoat() {
+        ctx.drawImage(
+          boatImages[lives] || boatImages[0],
+          boatX,
+          boatY,
+          fullBoatWidth,
+          fullBoatHeight
+        );
+      }
+
+      function drawObstacles() {
+        ctx.fillStyle = "red";
+        obstacles.forEach((obs) => {
+          ctx.fillRect(obs.x, obs.y, obstacleWidth, obstacleHeight);
+        });
+      }
+
+      function drawRescueItems() {
+        rescueItems.forEach((item) => {
+          ctx.drawImage(item.image, item.x, item.y, item.width, item.height);
+        });
+      }
+
+      function drawRocks() {
+        rocks.forEach((rock) => {
+          ctx.drawImage(rock.image, rock.x, rock.y, rock.width, rock.height);
+        });
+      }
+
+      function drawRepairTools() {
+        repairTools.forEach((tool) => {
+          ctx.drawImage(
+            repairToolImage,
+            tool.x,
+            tool.y,
+            repairToolWidth,
+            repairToolHeight
+          );
+        });
+      }
+
+      function isEllipseCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
+        const dx = x1 + w1 / 2 - (x2 + w2 / 2);
+        const dy = y1 + h1 / 2 - (y2 + h2 / 2);
+        const rw = (w1 + w2) / 2;
+        const rh = (h1 + h2) / 2;
+        return (dx * dx) / (rw * rw) + (dy * dy) / (rh * rh) <= 1;
+      }
+
+      function updateObstacles() {
+        obstacles.forEach((obs, index) => {
+          obs.y += 5 * gameSpeed;
+          if (obs.y > canvas.height) {
+            obstacles.splice(index, 1);
+          }
+
+          if (
+            isEllipseCollision(
+              boatX,
+              boatY,
+              boatWidth,
+              boatHeight,
+              obs.x,
+              obs.y,
+              obstacleWidth,
+              obstacleHeight
+            )
+          ) {
+            obstacles.splice(index, 1);
+            lives--;
+            if (lives <= 0) {
+              gameOver = true;
+            }
+          }
+        });
+
+        if (Math.random() < 0.005) {
+          obstacles.push({
+            x: Math.random() * (canvas.width - obstacleWidth),
+            y: -obstacleHeight,
+          });
+        }
+      }
+
+      function updateRescueItems() {
+        rescueItems.forEach((item, index) => {
+          item.y += 3 * gameSpeed;
+          if (item.y > canvas.height) {
+            rescueItems.splice(index, 1);
+          }
+
+          if (
+            isEllipseCollision(
+              boatX,
+              boatY,
+              boatWidth,
+              boatHeight,
+              item.x,
+              item.y,
+              item.width,
+              item.height
+            )
+          ) {
+            rescueItems.splice(index, 1);
+            score++;
+          }
+        });
+
+        if (Math.random() < 0.005) {
+          const randomRescue =
+            rescueImages[Math.floor(Math.random() * rescueImages.length)];
+          rescueItems.push({
+            x: Math.random() * (canvas.width - randomRescue.width),
+            y: -randomRescue.height,
+            image: randomRescue.image,
+            width: randomRescue.width,
+            height: randomRescue.height,
+          });
+        }
+      }
+
+      function updateRocks() {
+        rocks.forEach((rock, index) => {
+          rock.y += 3 * gameSpeed;
+          if (rock.y > canvas.height) {
+            rocks.splice(index, 1);
+          }
+
+          if (
+            isEllipseCollision(
+              boatX,
+              boatY,
+              boatWidth,
+              boatHeight,
+              rock.x,
+              rock.y,
+              rock.width,
+              rock.height
+            )
+          ) {
+            rocks.splice(index, 1);
+            lives--;
+            if (lives <= 0) {
+              gameOver = true;
+            }
+          }
+        });
+
+        if (Math.random() < 0.005) {
+          const randomRock =
+            rockImages[Math.floor(Math.random() * rockImages.length)];
+          rocks.push({
+            x: Math.random() * (canvas.width - randomRock.width),
+            y: -randomRock.height,
+            image: randomRock.image,
+            width: randomRock.width,
+            height: randomRock.height,
+          });
+        }
+      }
+
+      function updateRepairTools() {
+        repairTools.forEach((tool, index) => {
+          tool.y += 2 * gameSpeed;
+          if (tool.y > canvas.height) {
+            repairTools.splice(index, 1);
+          }
+
+          if (
+            isEllipseCollision(
+              boatX,
+              boatY,
+              boatWidth,
+              boatHeight,
+              tool.x,
+              tool.y,
+              repairToolWidth,
+              repairToolHeight
+            )
+          ) {
+            repairTools.splice(index, 1);
+            if (lives < 3) {
+              lives++;
+            }
+          }
+        });
+
+        if (score >= 20 && Math.random() < 0.001) {
+          repairTools.push({
+            x: Math.random() * (canvas.width - repairToolWidth),
+            y: -repairToolHeight,
+          });
+        }
+      }
+
+      function updateBoat() {
+        if (touchX !== null) {
+          boatX += (touchX - boatX - boatWidth / 2) * 0.1;
+        }
+
+        if (leftArrowPressed) {
+          boatX -= boatSpeed;
+        }
+
+        if (rightArrowPressed) {
+          boatX += boatSpeed;
+        }
+
+        if (boatX < 0) boatX = 0;
+        if (boatX + boatWidth > canvas.width) boatX = canvas.width - boatWidth;
+      }
+
+      function drawScore() {
+        ctx.fillStyle = "black";
+        ctx.font = "24px Arial";
+        ctx.fillText(`Score: ${score}`, 10, 30);
+        ctx.fillText(`Lives: ${lives}`, 10, 60);
+      }
+
+      function increaseGameSpeed() {
+        if (score > 0 && score % 10 === 0 && score !== lastSpeedUpdateScore) {
+          gameSpeed += 0.05;
+          lastSpeedUpdateScore = score;
+        }
+      }
+
+      function gameLoop() {
+        if (gameOver) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          drawBoat();
+          drawObstacles();
+          drawRescueItems();
+          drawRocks();
+          drawRepairTools();
+          drawScore();
+
+          ctx.fillStyle = "black";
+          ctx.font = "48px Arial";
+          ctx.fillText("Game Over", canvas.width / 2 - 120, canvas.height / 2);
+          const gameOverBoat = boatImages[0];
+          ctx.drawImage(
+            gameOverBoat,
+            boatX,
+            boatY,
+            fullBoatWidth,
+            fullBoatHeight
+          );
+          return;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawBoat();
+        drawObstacles();
+        drawRescueItems();
+        drawRocks();
+        drawRepairTools();
+        drawScore();
+
+        updateBoat();
+        updateObstacles();
+        updateRescueItems();
+        updateRocks();
+        updateRepairTools();
+        increaseGameSpeed();
+
+        requestAnimationFrame(gameLoop);
+      }
+
+      gameLoop();
+    </script>
+  </body>
+</html>
